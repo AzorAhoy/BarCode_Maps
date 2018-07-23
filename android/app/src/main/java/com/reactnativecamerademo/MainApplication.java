@@ -3,12 +3,15 @@ package com.reactnativecamerademo;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+
+import com.airbnb.android.react.maps.MapsPackage;
+import org.reactnative.camera.RNCameraPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import org.reactnative.camera.RNCameraPackage;
-import com.airbnb.android.react.maps.MapsPackage;
+
+
 
 import java.util.Arrays;
 import java.util.List;

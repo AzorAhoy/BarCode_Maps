@@ -8,12 +8,14 @@ import { Scan } from './App/SC01'
 import { Map }  from './App/SC02'
 import { DrugInfo } from './App/SC04'
 import { YellowBox } from 'react-native';
+import testing from './testing';
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 
 const Router = createStackNavigator({
     Screen_SC01: Scan,
     Screen_SC02: Map,
-    Screen_SC04: DrugInfo
+    Screen_SC04: DrugInfo,
+    Search: testing,
 },
 {
     initialRouteName:'Screen_SC01'

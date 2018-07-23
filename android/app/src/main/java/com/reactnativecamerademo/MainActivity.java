@@ -1,6 +1,7 @@
 package com.reactnativecamerademo;
 
 import com.facebook.react.ReactActivity;
+import org.reactnative.camera.RNCameraPackage;
 
 public class MainActivity extends ReactActivity {
 
