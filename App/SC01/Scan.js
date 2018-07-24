@@ -12,12 +12,16 @@ import {
   TouchableOpacity,
   View,
   ImageBackground,
-  NetInfo
+  Slider,
+  NetInfo,
+  Dimensions
 } from 'react-native';
-import { RNCamera } from 'react-native-camera';
+import {RNCamera} from 'react-native-camera';
 import OfflineNotice from './OfflineNotice';
-import {createStackNavigator} from 'react-navigation';
-import { Map } from '../SC02';
+
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
+
 NetInfo.isConnected.fetch().then(isConnected => {
   if(isConnected)
   {
@@ -31,17 +35,47 @@ NetInfo.isConnected.fetch().then(isConnected => {
 export default class Scanner extends Component {
   constructor(props) {
     super(props);
-    this.camera = null;
+    this.RNCamera = null;
     this.barcodeCodes = [];
 
     this.state = {
-      camera: {
         type: RNCamera.Constants.Type.back,
-	      barcodeFinderVisible: true
-      }
+        barcodeFinderVisible: true,
+        zoom: 0,
+        autoFocus: 'on',
+        depth: 0,
     };
-}
-  
+  }
+  zoomOut() {
+    this.setState({
+      zoom: this.state.zoom - 0.1 < 0 ? 0 : this.state.zoom - 0.1,
+    });
+  }
+
+  zoomIn() {
+    this.setState({
+      zoom: this.state.zoom + 0.1 > 1 ? 1 : this.state.zoom + 0.1,
+    });
+  }  
+
+  toggleFocus() {
+    this.setState({
+      autoFocus: this.state.autoFocus === 'on' ? 'off' : 'on',
+    });
+  }
+
+  setFocusDepth(depth) {
+    this.setState({
+      depth: this.state.depth = depth,
+    });
+  }
+
+  setZoom(zoom) {
+    this.setState({
+      zoom: this.state.zoom = zoom,
+    });
+  }
+
   onBarCodeRead(scanResult) {
     // alert('Barcode detected!');
     // console.warn(scanResult.type);
@@ -55,6 +89,7 @@ export default class Scanner extends Component {
           id: scanResult.data,
           type: scanResult.type
         });
+        this.barcodeCodes = [];
 	    }
     }
     return;
@@ -67,42 +102,118 @@ export default class Scanner extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style = {styles.jp}>バーコード読み取り</Text>
-        <Text style = {styles.jp}>枠内にバーコードを差してください</Text>
         <RNCamera
           style = {styles.cam}
           barCodeTypes={[
             RNCamera.Constants.BarCodeType.ean13,
             RNCamera.Constants.BarCodeType.qr,
+            RNCamera.Constants.BarCodeType.aztec,
+            RNCamera.Constants.BarCodeType.code128,
+            RNCamera.Constants.BarCodeType.code39,
+            RNCamera.Constants.BarCodeType.code39mod43,
+            RNCamera.Constants.BarCodeType.ean8,
+            RNCamera.Constants.BarCodeType.pdf417,
+            RNCamera.Constants.BarCodeType.upce,
+            RNCamera.Constants.BarCodeType.interleaved2of5,
+            RNCamera.Constants.BarCodeType.itf14,
+            RNCamera.Constants.BarCodeType.datamatrix
           ]}
-          barcodeFinderVisible = {this.state.camera.barcodeFinderVisible}
-          barcodeFinderWidth = {280}
-          barcodeFinderHeight = {280}
-          barcodeFinderBorderColor = 'white'
-          barcodeFinderBorderWidth = {2}
-          //defaultTouchToFocus
-          autoFocus
+          zoom = {this.state.zoom}
+          focusDepth = {this.state.depth}
           onBarCodeRead={this.onBarCodeRead.bind(this)}
-          ref={ref => {
-            this.camera = ref;
+          ref={(cam) => {
+            this.RNCamera = cam;
           }}
+          //aspect = {RNCamera.Constants.Aspect.fill}
           //onFocusChanged = {() => {}}
-          onZoomChanged = {() => {}}
+          //onZoomChanged = {() => {}}
           type={RNCamera.Constants.Type.back}
           flashMode={RNCamera.Constants.FlashMode.off}
-          permissionDialogTitle={'Permission to use camera'}
-          permissionDialogMessage={'We need your permission to use your camera phone'}
-        />
-        <View style={{ flex: 0, flexDirection: 'column', justifyContent: 'center', }}>
-          <TouchableOpacity style = {styles.button} >
-            <Text style = {styles.white}> Drugs </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button} onPress={()=>this.check()}>
-            <Text style = {styles.white}> Maps </Text>
-          </TouchableOpacity>
+          permissionDialogTitle={'Permission to use RNCamera'}
+          permissionDialogMessage={'We need your permission to use your RNCamera phone'}
+        >
+        <View style={{
+            flex:1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            width:width,
+            }}>
+          <Text style = {styles.jp}>
+              枠内にバーコードを差してください
+          </Text>
         </View>
-        <OfflineNotice/>
+        
+        
+        <View style={{flexDirection: 'row-reverse', flex: 5}}>
+            <View style={{flex: 0.5, backgroundColor: 'rgba(0, 0, 0, 0.5)', width:width}}>
+            </View>
+            <View
+              style = {{
+                flex: 4,
+                borderColor: 'white',
+                borderWidth: 2,
+                backgroundColor: 'transparent' ,
+                //marginBottom: 10,
+                //height:height,
+                width:width,
+              }}
+            > 
+            </View>
+            <View style={{flex: 0.5, backgroundColor: 'rgba(0, 0, 0, 0.5)', width:width}}>
+            </View>
+          </View>
+        
+        {/* <View
+            style = {{
+              flex: 1,
+              width: 300,
+              height: 300,
+              //justifyContent: 'space-between',
+              //alignItems: 'space-around',
+              alignSelf: 'center',
+              //alignContent: 'space-around',
+              borderWidth : 2,
+              borderColor: '#ffffff',
+              backgroundColor: 'rgba(0, 0, 0, 0.4)',
+              zIndex: 0,
+            }}
+          >
+            <Slider
+              style={{ width: 200, marginTop: 10, alignSelf: 'flex-end' }}
+              onValueChange={this.setFocusDepth.bind(this)}
+              step={0.1}
+              disabled={this.state.autoFocus === 'on'}
+            />
+
+            <Slider
+              style={{ 
+                width: 200, 
+                marginTop: 10, 
+                alignSelf: 'flex-end' , 
+
+              }}
+                onValueChange={this.setZoom.bind(this)}
+                step={0.05}
+                //disabled={this.state.autoFocus === 'on'}
+                orientation = 'vertical'
+            />
+           
+          </View> */}
+            
+          <View style={{ flex: 5, backgroundColor: 'rgba(0, 0, 0, 0.5)', width: width, alignItems: 'center' }}>
+              <TouchableOpacity style = {styles.button} >
+                <Text style = {styles.white}> Drugs </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.button} onPress={()=>this.check()}>
+                <Text style = {styles.jp}> 地図 </Text>
+              </TouchableOpacity>
+              <View style={{flex: 3}}>
+              </View>
+          </View>
+        
+        </RNCamera>
         </View>
     );
   }
@@ -112,7 +223,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: 'black'
+    //backgroundColor: 'rgba(0, 0, 0, 1)',
+    //zIndex: 1,
   },
   preview: {
     flex: 1,
@@ -120,34 +232,59 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   button: {
-    flex: 0,
+    flex: 1,
     backgroundColor: 'transparent',
     borderRadius: 5,
-    padding: 15,
-    paddingHorizontal: 20,
-    alignSelf: 'center',
-    margin: 20,
+    //paddingVertical: 40,
+    //paddingHorizontal: 20,
+    //padding: 10,
+    //paddingTop: 10,
+    marginTop: 20,
+    //alignSelf: 'center',
+    //height:height*1.5,
+    width:width*0.6,
+    alignItems: 'center',
+    justifyContent: 'center',
     borderColor: 'white',
     borderWidth: 1,
   },
   cam: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: 'transparent',
-    marginHorizontal: 20,
+    //marginHorizontal: 20,
     //marginVertical: 90,
   },
 
   jp: {
     color: 'white',
-    textAlign: 'center',
     fontFamily: 'Meiryo',
-    fontSize: 30,
+    fontSize: 18,
   },
   white: {
     color: 'white',
     textAlign: 'center',
-    fontFamily: 'Arial'
+    fontFamily: 'Arial',
+    fontSize: 20,
+  },
+  overlay: {
+    position: 'absolute',
+    padding: 16,
+    right: 0,
+    left: 0,
+    alignItems: 'center',
+  },
+  topOverlay: {
+    top: 0,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  bottomOverlay: {
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
   }
 });
