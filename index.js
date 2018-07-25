@@ -12,13 +12,35 @@ import testing from './testing';
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 
 const Router = createStackNavigator({
-    Screen_SC01: Scan,
-    Screen_SC02: Map,
-    Screen_SC04: DrugInfo,
-    Search: testing,
+    Screen_SC01: {
+        screen:Scan,
+        navigationOptions:{
+            headerTitle: "バーコード読み取り",
+            headerStyle: { backgroundColor: '#00CCFF'},
+            headerTitleStyle:{
+                fontSize: 20,
+                color: '#FFFFFF', 
+                fontWeight: "bold", 
+                paddingLeft: 70,
+                //alignSelf: 'center',
+                //justifyContent: 'center',
+                textAlign: 'center',
+                fontFamily: 'Meiryo',
+            }
+        }
+        },
+    Screen_SC02: {
+        screen: Map,
+        navigationOptions:{
+            header: null
+            
+        }
+    },
+    Screen_SC04: DrugInfo
 },
 {
-    initialRouteName:'Screen_SC01'
+    initialRouteName:'Screen_SC01',
+    //headerMode: 'none'
  }
 )
 AppRegistry.registerComponent(appName, () => Router);
