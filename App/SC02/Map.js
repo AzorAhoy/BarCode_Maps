@@ -28,6 +28,7 @@ export default class App extends Component {
       selected:"H",
     }
   }
+
   render() {
     return (
       <View style={styles.container}>
@@ -95,7 +96,7 @@ export default class App extends Component {
             width: width,
             height: height,
           }}
-          //provider="google"
+          // //provider="google"
 					showsUserLocation={true}
 					showsMyLocationButton={true}
 					showsCompass={true}
@@ -114,10 +115,13 @@ export default class App extends Component {
         
         
           <Marker
-            coordinate={{
-              latitude: 21.028511,
-              longitude: 105.804817,
+            coordinate = {{
+                        latitude: 21.028511,
+                        longitude: 105.804817,
+                        latitudeDelta: 0.092,
+                        longitudeDelta: 0.0001,
             }}
+            draggable
             title={'hello'}
             description={'..'}
           />

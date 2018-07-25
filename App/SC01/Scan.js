@@ -18,19 +18,19 @@ import {
 } from 'react-native';
 import {RNCamera} from 'react-native-camera';
 import OfflineNotice from './OfflineNotice';
+import DeviceInfo from 'react-native-device-info';
+import {login, scan, getProduct} from '../../api';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
+ 
+const param = {
+  language_code:'JP',
+  password : '123456',
+  device_code : DeviceInfo.getDeviceId()
+}
+       const test = '4946842637867';
 
-NetInfo.isConnected.fetch().then(isConnected => {
-  if(isConnected)
-  {
-      alert('Internet is connected');
-  }
-  else {
-    alert('No Internet');
-  }
-})
 
 export default class Scanner extends Component {
   constructor(props) {
@@ -44,8 +44,24 @@ export default class Scanner extends Component {
         zoom: 0,
         autoFocus: 'on',
         depth: 0,
+        token: '',
+        data: '',
+        // product: {
+        //   name: '',
+        //   img_product: '',
+        //   product_code: '',
+        //   price: '',
+        //   detail_typeE1: ''
+        // },
+        name:'',
+          img_product: '',
+          product_code: '',
+          price: '',
+          detail_typeE1: '',
+        info: ''
     };
   }
+
   zoomOut() {
     this.setState({
       zoom: this.state.zoom - 0.1 < 0 ? 0 : this.state.zoom - 0.1,
@@ -83,11 +99,42 @@ export default class Scanner extends Component {
     if (scanResult.data != null) {
 	    if (!this.barcodeCodes.includes(scanResult.data)) {
 	      this.barcodeCodes.push(scanResult.data);
-        console.warn('onBarCodeRead call');
+        //console.warn('onBarCodeRead call');
         //alert(scanResult.data);
+        // this.props.navigation.navigate('Screen_SC04', {
+        //   id: scanResult.data, 
+        //   type: scanResult.type
+        // });
+ 
+        scan(scanResult.data)
+        .then((res) => {
+          this.setState({          
+            // name: this.state.product.name = res.body.name,
+            // img_product: this.state.product.img_product = res.body.img_product,
+            // product_code: this.state.product.product_code = res.body.product_code,
+            // price: this.state.product.price = res.body.price,
+            // detail_typeE1: this.state.product.detail_typeE1 = res.body.detail_typeE1,
+            // info: res.body
+            //product:res.body
+            name: res.body.name,
+            img_product: res.body.img_product,
+            price : res.body.price,
+            product_code: res.body.product_code,
+             detail_typeE1 : res.body.detail_typeE1
+          } );
+          console.log("Data : "+this.state.name);
+          //console.warn("Data : "+this.state.info); 
+          //alert(this.state.name)
+        }).catch((error)=>{
+          this.setState({ name : error });
+        });
         this.props.navigation.navigate('Screen_SC04', {
-          id: scanResult.data,
-          type: scanResult.type
+          id: scanResult.data, 
+          type: scanResult.type,
+           img_product: this.state.img_product,
+           price: this.state.price,
+           detail_typeE1: this.state.detail_typeE1,
+          name : this.state.name
         });
         this.barcodeCodes = [];
 	    }
@@ -98,6 +145,25 @@ export default class Scanner extends Component {
     this.props.navigation.navigate('Screen_SC02');
     //alert("Thong bao");
   }
+  
+  componentDidMount() {
+    //this.result();
+  //  this.onBarCodeRead(scanResult);
+    //console.warn(this.state.data); 
+  }
+  
+  result(){
+    login(param).then((res) => {
+
+          this.setState({ data: res.body.device_code } );
+          console.log("Data : "+this.state.data);
+          alert(this.state.data)
+        }).catch((error)=>{
+          this.setState({ data: error });
+    });
+  };
+
+  
   
   render() {
     return (
@@ -142,11 +208,12 @@ export default class Scanner extends Component {
           <Text style = {styles.jp}>
               枠内にバーコードを差してください
           </Text>
+          <Text  style = {styles.white}>{param.id}</Text>
         </View>
         
         
         <View style={{flexDirection: 'row-reverse', flex: 5}}>
-            <View style={{flex: 0.5, backgroundColor: 'rgba(0, 0, 0, 0.5)', width:width}}>
+            <View style={{flex: 0.5, backgroundColor: 'rgba(0, 0, 0, 0.5)', width:width }}>
             </View>
             <View
               style = {{
@@ -157,6 +224,7 @@ export default class Scanner extends Component {
                 //marginBottom: 10,
                 //height:height,
                 width:width,
+                //height: width* 0.5
               }}
             > 
             </View>
@@ -209,6 +277,7 @@ export default class Scanner extends Component {
               <TouchableOpacity style={styles.button} onPress={()=>this.check()}>
                 <Text style = {styles.jp}> 地図 </Text>
               </TouchableOpacity>
+
               <View style={{flex: 3}}>
               </View>
           </View>
